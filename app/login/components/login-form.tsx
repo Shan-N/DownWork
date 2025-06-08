@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Github } from "lucide-react";
+import { Github, Loader2Icon } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -47,6 +47,7 @@ useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
+        toast.success("You are already logged in");
         router.push('/dashboard');
       }
     };
@@ -57,6 +58,9 @@ useEffect(() => {
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           email: data.email,
           password: data.password,
@@ -85,15 +89,21 @@ useEffect(() => {
         body: JSON.stringify({ action: `login-with-${provider}` }),
       });
 
-      const result = await res.json();
+        const result = await res.json();
 
-      if (!res.ok) {
-        toast.error(result.error || `Login with ${provider} failed`);
+        if (!res.ok) {
+          toast.error(result.error || `Login with ${provider} failed`);
+          return;
+        }
+
+        if (result.url) {
+          window.location.href = result.url;
+        }
+      } catch (err) {
+        toast.error("OAuth login error");
       }
-    } catch (err) {
-      toast.error("OAuth login error");
-    }
-  };
+    };
+
 
   return (
     <div className={cn("flex flex-col gap-6 w-full", className)} {...props}>
@@ -123,7 +133,7 @@ useEffect(() => {
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
                 <a
-                  href="#"
+                  href="/forgot"
                   className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
                 >
                   Forgot your password?
@@ -141,7 +151,11 @@ useEffect(() => {
 
             <div className="flex flex-col gap-3">
               <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? "Logging in..." : "Login"}
+              {isSubmitting ? 
+                <>
+                <Loader2Icon className="animate-spin h-4 w-4 mr-2" /> Logging in...</> :
+                "Login"  
+              }
               </Button>
 
               <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">

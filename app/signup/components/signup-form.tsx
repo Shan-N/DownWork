@@ -24,8 +24,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { supabase } from "@/app/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import toast from "react-hot-toast";
-import { Loader2Icon, LoaderIcon } from "lucide-react";
+import { toast } from "react-hot-toast";
+import { Loader2Icon } from "lucide-react";
 
 const Role = [
   { value: "client", label: "Client" },

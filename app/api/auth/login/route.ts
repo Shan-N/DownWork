@@ -68,8 +68,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, user: data.user });
     }
 
-    if (action === "login-with-git" || action === "login-with-google") {
-      const provider = action === "login-with-git" ? "github" : "google";
+    if (action === "login-with-github" || action === "login-with-google") {
+      const provider = action === "login-with-github" ? "github" : "google";
 
       const { error, data } = await supabase.auth.signInWithOAuth({
         provider,

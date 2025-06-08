@@ -1,7 +1,6 @@
 import { cn } from "@/lib/utils";
 import React from "react";
 import { Inter } from "next/font/google";
-import { MoveDown } from "lucide-react";
 import Navbar from "./ui/navbar";
 
 const inter = Inter({
