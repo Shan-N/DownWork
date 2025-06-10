@@ -21,6 +21,7 @@ const Navbar = () => {
     const options = [
         {value: "dashboard", label: "Dashboard", onclick: () => {router.push("/dashboard")}},
         {value: "profile", label: "Profile", onclick: () => {router.push("/profile")}},
+        {value : "jobs", label: "Jobs", onclick: () => {router.push("/jobs")}},
         {value: "settings", label: "Settings", onclick: () => {router.push("/settings")}},
         {value: "logout", label: "Logout", onclick: () => {handleSignout()}}
     ]
@@ -39,12 +40,13 @@ const Navbar = () => {
           }
         }
         fetchUser();
-      }, [])
+      }, [setUser])
 
       const handleSignout = async () => {
         try {
             await axios.post('/api/auth/signout')
-            router.push('/'); // Redirect to home page after sign out
+            router.push('/');
+            setUser(null);
 
         }
         catch (error) {
@@ -59,9 +61,6 @@ const Navbar = () => {
                       <div className="flex flex-row justify-between px-8">
                           <span className="flex flex-row font-bold text-xl items-center tracking-wider"><Link href='/' className="flex flex-row items-center"><MoveDown className="size-5"/>Work</Link></span>
                           <div className="flex flex-row items-center">
-                              {/* <span className="border border-white px-4 py-2 text-white rounded-lg cursor-pointer select-none" onClick={() => {
-                                  router.push("/dashboard");
-                              }}>{user.full_name}</span> */}
                               <DropdownMenu >
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="outline">{user.full_name}</Button>
@@ -80,7 +79,8 @@ const Navbar = () => {
               </div>
           )
       }
-      else {
+      else if(!user) {
+          // User is not logged in, show login/signup options
         return (
               <div className="sticky z-10 w-full bg-black/50 backdrop-blur-md">
                   <nav className={cn("flex flex-col py-6 border-b-1 border-white",inter.className)}>

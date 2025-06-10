@@ -16,7 +16,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
     // return NextResponse.json({ data }, { status: 200 });
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL("/profile", request.url));
   } catch (error) {
     return NextResponse.json({ error: `An unexpected error occurred ${error}` }, { status: 500 });
   }

@@ -89,14 +89,21 @@ const SignupForm = ({ className }: React.ComponentProps<"div">) => {
         return;
       }
 
-      const { error: insertError } = await supabase.from("users").insert({
+      const { error: userInsertError } = await supabase.from("users").insert({
         id: userId,
         role: role,
         full_name: username,
       });
 
-      if (insertError) {
-        toast.error(`Insert failed: ${insertError.message}`, { id: loadingToast });
+      const { error: profileInsertError } = await supabase.from("profiles").insert({
+        id: userId,
+        full_name: username,
+        role: role,
+      })
+
+      if (userInsertError || profileInsertError) {
+        const errorMessage = userInsertError?.message || profileInsertError?.message || "Unknown error";
+        toast.error(`Insert failed: ${errorMessage}`, { id: loadingToast });
         return;
       }
 
