@@ -44,8 +44,9 @@ export default function ForgotPasswordPage() {
 
       toast.success("Password reset link sent. Check your email.");
       reset();
-    } catch (err) {
-      toast.error("Unexpected error occurred");
+    } catch (error) {
+      toast.error(`Unexpected error occurred `);
+      console.error("Forgot Password Error:", error);
     }
   };
 

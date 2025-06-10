@@ -79,6 +79,7 @@ useEffect(() => {
       router.push("/dashboard");
     } catch (error) {
       toast.error("Unexpected error occurred");
+      console.error("Login Error:", error);
     }
   };
 
@@ -101,6 +102,7 @@ useEffect(() => {
         }
       } catch (err) {
         toast.error("OAuth login error");
+        console.error("OAuth Login Error:", err);
       }
     };
 

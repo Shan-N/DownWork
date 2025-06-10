@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useForm } from "react-hook-form";
+import { FieldError, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { supabase } from "@/app/utils/supabase/client";
@@ -54,7 +54,6 @@ const SignupForm = ({ className }: React.ComponentProps<"div">) => {
     register,
     handleSubmit,
     setValue,
-    formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
   });
@@ -103,12 +102,27 @@ const SignupForm = ({ className }: React.ComponentProps<"div">) => {
 
       toast.success("Account created successfully!", { id: loadingToast });
       router.push("/login");
-    } catch (err: any) {
-      toast.error(`Unexpected error: ${err.message}`, { id: loadingToast });
+    } catch (err : unknown) {
+      if (err instanceof Error) {
+        toast.error(`Unexpected error`, { id: loadingToast });
+        console.error("Signup Error:", err.message);
+      } else {
+        toast.error("An unknown error occurred", { id: loadingToast });
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  const onError = (errors: Partial<Record<keyof FormData, FieldError>>) => {
+  Object.values(errors).forEach((error) => {
+    if (error?.message) {
+      toast.error(error.message);
+    }
+  });
+};
+
+
 
   return (
     <div className={cn("flex flex-col gap-6 w-full", className)}>
@@ -120,7 +134,7 @@ const SignupForm = ({ className }: React.ComponentProps<"div">) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-6">
             <div className="grid gap-3">
               <Label htmlFor="email">Email</Label>
               <Input

@@ -8,6 +8,7 @@ import Link from "next/link";
 import axios from "axios";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./dropdown-menu";
 import { Button } from "./button";
+import { UserMetadata } from "@supabase/supabase-js";
 
 const inter = Inter({
     variable: "--font-inter",
@@ -26,7 +27,7 @@ const Navbar = () => {
 
 
     const router = useRouter();
-    const [user, setUser] = React.useState<any>(null);
+    const [user, setUser] = React.useState<UserMetadata | null>(null);
 
       React.useEffect(() => {
         const fetchUser = async () => {
