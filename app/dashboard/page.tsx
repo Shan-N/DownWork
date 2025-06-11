@@ -22,11 +22,14 @@ const DashboardPage = () => {
 
     useEffect(() => {
         const fetchUserRole = async () => {
+            const { data : userData } = await supabase.from('profiles').select('role').single();
+            if (userData) { 
+                setRole(userData.role);
+            } 
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
                 const user = session.user;
                 // Assuming user metadata contains the role
-                setRole(user.user_metadata?.role || null);
                 setName(user.user_metadata?.full_name || null);
             } else {
                 router.push('/login'); // Redirect to login if not authenticated
