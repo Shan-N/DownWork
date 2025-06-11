@@ -1,42 +1,22 @@
 'use client';
-import { Button } from "@/components/ui/button";
-import Navbar from "@/components/ui/navbar";
-import { cn } from "@/lib/utils";
-import axios from 'axios';
-import { useRouter } from "next/navigation";
-import { Inter } from "next/font/google";
 
-const inter = Inter({
-    variable: "--font-inter",
-    subsets: ["latin"]
-})
+import Image from "next/image";
 
 
-const DashboardPage = () => {
-    const router = useRouter();
 
-    const handleSignout = async () => {
-        try {
-            await axios.post('/api/auth/signout')
-            router.push('/'); // Redirect to home page after sign out
 
-        }
-        catch (error) {
-            console.error("Sign out error:", error);
-        }
-    }
+const KabutarPage = () => {
     return (
-        <div className={cn("dark text-white", inter.className)}>
-            <Navbar />
-            <div className="flex flex-col items-center justify-center min-h-screen">
-                <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
-                <p className="mb-6">Welcome to your dashboard!</p>
-                <Button onClick={handleSignout} className="bg-red-500 hover:bg-red-600">
-                    Sign Out
-                </Button>
+        <div className="dark text-white">
+            <div className="flex flex-col px-4 py-4 min-h-screen">
+                <h2 className="text-xl font-semibold">Kabutar Page</h2>
+                <span className="font-light text-sm text-gray-400">This is the Kabutar page.</span>
+                <div className="grid grid-cols-1 gap-4 py-4">
+                    <Image src="/kabutar.png" alt="Kabutar" loading="lazy" className="mx-auto" />
+                </div>
             </div>
         </div>
-    )
+    );
 }
 
-export default DashboardPage;
+export default KabutarPage;
