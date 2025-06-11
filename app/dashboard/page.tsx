@@ -115,7 +115,7 @@ const DashboardPage = () => {
                             ));
                         } catch (error) {
                             // console.error("Error fetching project title:", error);
-                            toast.error("Failed to fetch project title for application");   
+                            toast.error(`${error} while fetching project title`);   
                         }
                     }
                     
