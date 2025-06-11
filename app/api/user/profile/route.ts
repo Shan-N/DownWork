@@ -24,6 +24,9 @@ export async function POST(req : Request) {
             location: location
         }, { onConflict: 'id' });
         if (updateError) {
+            if( updateError.code === '23505') { // Unique constraint violation
+                return NextResponse.json({ error: "Username already exists" }, { status: 409 });
+            }
             return NextResponse.json({ error: updateError.message }, { status: 400 });
         }
         return NextResponse.json({ message: "Profile updated successfully" }, { status: 200 });

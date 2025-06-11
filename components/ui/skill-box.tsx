@@ -6,6 +6,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import axios from 'axios';
 
 interface SkillComboboxProps {
   skills: string[];
@@ -26,10 +27,14 @@ export const SkillCombobox = ({ skills, value, onChange }: SkillComboboxProps) =
     setOpen(false);
   };
 
-  const handleAddNew = () => {
+  const handleAddNew = async() => {
     if (inputValue.trim() && !skills.includes(inputValue)) {
       onChange(inputValue);
       setOpen(false);
+      const response = await axios.post('/api/user/skills', { skill: inputValue });
+      if (response.status === 200) {
+        console.log("Skill added successfully:", response.data);
+      }
     }
   };
 

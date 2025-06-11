@@ -21,7 +21,7 @@ const Navbar = () => {
     const options = [
         {value: "dashboard", label: "Dashboard", onclick: () => {router.push("/dashboard")}},
         {value: "profile", label: "Profile", onclick: () => {router.push("/profile")}},
-        {value : "jobs", label: "Jobs", onclick: () => {router.push("/jobs")}},
+        {value : "projects", label: "Projects", onclick: () => {router.push("/projects")}},
         {value: "settings", label: "Settings", onclick: () => {router.push("/settings")}},
         {value: "logout", label: "Logout", onclick: () => {handleSignout()}}
     ]

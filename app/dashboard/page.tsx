@@ -29,10 +29,9 @@ const DashboardPage = () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
                 const user = session.user;
-                // Assuming user metadata contains the role
                 setName(user.user_metadata?.full_name || null);
             } else {
-                router.push('/login'); // Redirect to login if not authenticated
+                router.push('/login'); 
             }
         };
         const fetchTime = () => {
@@ -45,10 +44,6 @@ const DashboardPage = () => {
                 setTime("Good evening");
             }
         }
-
-        // const fetchProjects = async () => {
-
-        // }
 
         fetchUserRole();
         fetchTime();

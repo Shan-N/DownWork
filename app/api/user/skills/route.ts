@@ -27,26 +27,45 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-    try {
-        const supabase = await createClient();
-        const { skill } = await req.json();
-        const { data: { user }, error } = await supabase.auth.getUser();
-        if (error) {
-            return NextResponse.json({ error: error.message }, { status: 400 });
-        }
-        if (!user) {
-            return NextResponse.json({ error: "User not found" }, { status: 404 });
-        }
-        const { error: insertError } = await supabase.from('skills').insert({
-            id: user.id,
-            skill: skill
-        });
-        if (insertError) {
-            return NextResponse.json({ error: insertError.message }, { status: 400 });
-        }
-        return NextResponse.json({ message: "Skill added successfully" }, { status: 200 });
-    } catch (error) {
-        console.error("Skill addition error:", error);
-        return NextResponse.json({ error: "An unexpected error occurred" }, { status: 500 });
+  try {
+    const supabase = await createClient();
+    const { skill } = await req.json();
+    const { data: { user }, error } = await supabase.auth.getUser();
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Get the current max id
+    const { data: lastSkill, error: maxIdError } = await supabase
+      .from('skills')
+      .select('id')
+      .order('id', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (maxIdError && maxIdError.code !== 'PGRST116') {
+      return NextResponse.json({ error: maxIdError.message }, { status: 400 });
+    }
+
+    const newId = lastSkill?.id ? lastSkill.id + 1 : 1;
+
+    // Insert new skill
+    const { error: insertError } = await supabase.from('skills').insert({
+      id: newId,
+      name: skill
+    });
+
+    if (insertError) {
+      return NextResponse.json({ error: insertError.message }, { status: 400 });
+    }
+
+    return NextResponse.json({ message: "Skill added successfully", id: newId }, { status: 200 });
+  } catch (error) {
+    console.error("Skill addition error:", error);
+    return NextResponse.json({ error: "An unexpected error occurred" }, { status: 500 });
+  }
 }

@@ -115,7 +115,15 @@ const ProfilePage = () => {
       }
     } catch (error) {
       console.error("Error updating profile:", error);
+      if (axios.isAxiosError(error) && error.response) {
+        if (error.response.status === 409) {
+          toast.error("Username already exists. Please choose a different username.");
+        } else {
+          toast.error(`Error: ${error.response.data.error || "An error occurred"}`);
+        }
+      } else {
       toast.error("An error occurred while updating the profile.");
+      }
     }
   };
 
@@ -178,7 +186,7 @@ const ProfilePage = () => {
                     <Button
                       variant="outline"
                       type="button"
-                      className="text-blue-500 hover:underline flex items-center gap-2"
+                      className="text-blue-500 flex items-center gap-2"
                       onClick={handleAddSkill}
                     >
                       <PlusCircle /><span>Add Skill</span>
