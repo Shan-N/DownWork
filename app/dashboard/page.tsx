@@ -2,7 +2,6 @@
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/ui/navbar";
 import { cn } from "@/lib/utils";
-// import axios from 'axios';
 import { useRouter } from "next/navigation";
 import { Inter } from "next/font/google";
 import { useEffect, useState } from "react";
@@ -11,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { PlusCircle } from "lucide-react";
 
 const inter = Inter({
     variable: "--font-inter",
@@ -128,9 +128,8 @@ const DashboardPage = () => {
         const fetchAvailableProjects = async () => {
             const response = await axios.get('/api/projects');
             if (response.status === 200) {
-                setAvailableProjects(response.data);
-                availableProjects.slice(0, 4);
-                setAvailableProjects(availableProjects);
+                const parsedRes = response.data.slice(0, 5); // Limit to 5 projects
+                setAvailableProjects(parsedRes);
 
             } else {
                 toast.error("Failed to fetch available projects");
@@ -142,7 +141,7 @@ const DashboardPage = () => {
         fetchContracts();
         fetchApplications();
         fetchAvailableProjects();
-    }, [router, availableProjects, applications]);
+    }, [router]);
 
     if (role === 'client') {
     return (
@@ -219,7 +218,10 @@ const DashboardPage = () => {
                                                     ))}
                                                 </ul>
                                             ) : (
+                                                <>
                                                 <span className="text-gray-400">No projects created at the moment.</span>
+                                                <Button variant="outline" className=" flex flex-row items-center justify-center mt-2" onClick={() => router.push('/projects/create')}><PlusCircle /> Create Projects</Button>
+                                                </>
                                             )}
                                         </CardContent>
                                     </Card>

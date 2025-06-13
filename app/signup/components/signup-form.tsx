@@ -27,7 +27,7 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { Loader2Icon } from "lucide-react";
 
-const Role = [
+export const Role = [
   { value: "client", label: "Client" },
   { value: "freelancer", label: "Freelancer" },
 ];
