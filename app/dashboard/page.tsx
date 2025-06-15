@@ -41,7 +41,7 @@ interface Application {
 
 }
 
-interface Project {
+export interface Project {
     id : string;
     client_id: string;
     title: string;
@@ -63,7 +63,18 @@ const DashboardPage = () => {
 
     useEffect(() => {
         const fetchUserRole = async () => {
-            const { data : userData } = await supabase.from('profiles').select('role').single();
+            const { data, error } = await supabase.auth.getUser();
+
+            if (error) {
+                console.error("Error fetching user:", error);
+                return;
+            }
+            if (!data.user) {
+                router.push('/login'); // Redirect to login if no user is found
+                return;
+            }
+            const userId = data.user.id;
+            const { data : userData } = await supabase.from('profiles').select('role').eq('id', userId).single();
             if (userData) { 
                 setRole(userData.role);
             } 
@@ -308,10 +319,14 @@ const DashboardPage = () => {
                                         </CardHeader>
                                         <CardContent>
                                             {availableProjects && availableProjects.length > 0 ? (
-                                                <ul>
+                                                <ul key={"available-projects-list"}>
                                                     {availableProjects.map((project, idx) => (
-                                                        <li key={project.id || idx}>{project.title || "Untitled Project"}</li>
+                                                        <li key={project.id || idx} className="flex flex-row justify-between mt-2 gap-2">
+                                                            {project.title || "Untitled Project"}
+                                                            <Button key={idx} variant="outline" onClick={() => router.push(`/projects/${project.id}`)}>View Project</Button>
+                                                        </li>
                                                     ))}
+                                                     <Button className="mt-2 w-full" onClick={() => router.push(`/projects`)}>View All</Button>
                                                 </ul>
                                             ) : (
                                                 <span className="text-gray-400">No projects available at the moment.</span>
