@@ -5,11 +5,11 @@ import { NextResponse } from "next/server"
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+   context: { params: { id: string } }
 ) {
   try {
     const supabase = await createClient()
-    const resolvedParams = await params
+    const resolvedParams = await context.params
     const id = resolvedParams.id
 
     const { data: projectData, error } = await supabase
