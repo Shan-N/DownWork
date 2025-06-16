@@ -3,7 +3,7 @@ name: Deploy via SSH
 on:
   push:
     branches:
-      - main  
+      - main
 
 jobs:
   deploy:
@@ -35,11 +35,11 @@ jobs:
           docker build -t shan117/downwork:latest .
           docker push shan117/downwork:latest
 
-      - name: Deploy via SSH
+      - name: Deploy on EC2
         run: |
-          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-            cd /home/ubuntu/DownWork
-            git pull origin main
-            docker-compose down
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            cd /home/ubuntu/DownWork &&
+            git pull origin main &&
+            docker-compose down &&
             docker-compose up -d --build
-          EOF
+          "
