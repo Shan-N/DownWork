@@ -65,7 +65,7 @@ export function ProjectClient({ id }: ProjectClientProps) {
     try {
       const response = await axios.post(`/api/projects/${id}`, {
         proposal: coverLetter,
-        freelancer_id: freelancerId
+        freelancerId: freelancerId
       });
       if (response.status === 200) {
         toast.success("Application submitted successfully!");

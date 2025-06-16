@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  app:
+    image: shan117/downwork:latest
+    restart: always
+    env_file: .env.production
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
