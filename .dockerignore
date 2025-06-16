@@ -27,7 +27,7 @@ __mocks__/
 .env
 .env.local
 .env.*.local
-.env.production
+# .env.production
 
 # Ignore editor settings
 .vscode/
