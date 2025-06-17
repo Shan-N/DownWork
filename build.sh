@@ -1,6 +1,6 @@
-#!/bin/bash
 
-set -a  # Automatically export all variables
+
+set -a 
 source .env.production
 set +a
 

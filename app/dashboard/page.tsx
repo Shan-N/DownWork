@@ -109,32 +109,46 @@ const DashboardPage = () => {
         }
 
         const fetchApplications = async () => {
-            const response = await axios.get('/api/applications');
-            if (response.status === 200) {
-                setApplications(response.data);
-                applications.forEach(async (application) => {
+            try {
+                const response = await axios.get('/api/applications');
+                if (response.status !== 200) {
+                    toast.error("Failed to fetch applications");
+                    return;
+                }
+
+                const apps: Application[] = response.data;
+
+                const updatedApplications = await Promise.all(apps.map(async (application) => {
                     if (!application.project_id) {
                         toast.error("Application has no project associated");
+                        return { ...application, title: "Untitled Project" };
                     }
-                    else {
-                        const projectId = application.project_id;
-                        try {
-                            const { data : projectData } = await supabase.from('projects').select('*').eq('id', projectId).single();
-                            const projectTitle = projectData?.title || "Untitled Project";
-                            setApplications(prev => prev.map(app => 
-                                app.id === application.id ? { ...app, title: projectTitle } : app
-                            ));
-                        } catch (error) {
-                            // console.error("Error fetching project title:", error);
-                            toast.error(`${error} while fetching project title`);   
+
+                    try {
+                        const { data: projectData, error } = await supabase
+                            .from('projects')
+                            .select('title')
+                            .eq('id', application.project_id)
+                            .single();
+
+                        if (error || !projectData) {
+                            toast.error(`Error fetching project title for application ${application.id}`);
+                            return { ...application, title: "Untitled Project" };
                         }
+
+                        return { ...application, title: projectData.title || "Untitled Project" };
+                    } catch (err) {
+                        toast.error(`Unexpected ${err} for project ${application.project_id}`);
+                        return { ...application, title: "Untitled Project" };
                     }
-                    
-                })
-            } else {
-                toast.error("Failed to fetch applications");
+                }));
+
+                setApplications(updatedApplications);
+            } catch (err) {
+                toast.error("An error occurred while fetching applications");
+                console.error(err);
             }
-        }
+        };
 
         const fetchAvailableProjects = async () => {
             const response = await axios.get('/api/projects');
@@ -153,6 +167,17 @@ const DashboardPage = () => {
         fetchApplications();
         fetchAvailableProjects();
     }, [router]);
+
+    const handleViewApplication = (applicationId: string) => {
+        router.push(`/applications/${applicationId}`);
+    };
+    const handleViewContract = (contractId: string) => {
+        router.push(`/contracts/${contractId}`);
+    };
+
+    const handleViewProject = (projectId: string) => {
+        router.push(`/projects/${projectId}/edit`);
+    };
 
     if (role === 'client') {
     return (
@@ -189,7 +214,10 @@ const DashboardPage = () => {
                                             {contracts && contracts.length > 0 ? (
                                                 <ul>
                                                     {contracts.map((contract, idx) => (
-                                                        <li key={contract.id || idx}>{contract.title || "Untitled Contract"}</li>
+                                                        <li key={contract.id || idx} className="flex flex-row justify-between mt-2 gap-2">
+                                                            {contract.title || "Untitled Contract"}
+                                                            <Button variant="outline" onClick={() => handleViewContract(contract.id)}>Manage</Button>
+                                                        </li>
                                                     ))}
                                                 </ul>
                                             ) : (
@@ -207,7 +235,10 @@ const DashboardPage = () => {
                                             {applications && applications.length > 0 ? (
                                                 <ul>
                                                     {applications.map((application, idx) => (
-                                                        <li key={application.id || idx}>{application.title || "Untitled Contract"}</li>
+                                                        <li key={application.id || idx} className="flex flex-row justify-between mt-2 gap-2">
+                                                            {application.title || "Untitled Contract"}
+                                                            <Button variant="outline" onClick={() => handleViewApplication(application.id)}>View</Button>
+                                                        </li>
                                                     ))}
                                                 </ul>
                                             ) : (
@@ -225,7 +256,10 @@ const DashboardPage = () => {
                                             {availableProjects && availableProjects.length > 0 ? (
                                                 <ul>
                                                     {availableProjects.map((project, idx) => (
-                                                        <li key={project.id || idx}>{project.title || "Untitled Project"}</li>
+                                                        <li key={project.id || idx} className="flex flex-row justify-between mt-2 gap-2">
+                                                            {project.title || "Untitled Project"}
+                                                            <Button variant="outline" onClick={() => handleViewProject(project.id)}>Edit</Button>
+                                                        </li>
                                                     ))}
                                                 </ul>
                                             ) : (
@@ -285,7 +319,10 @@ const DashboardPage = () => {
                                             {contracts && contracts.length > 0 ? (
                                                 <ul>
                                                     {contracts.map((contract, idx) => (
-                                                        <li key={contract.id || idx}>{contract.title || "Untitled Contract"}</li>
+                                                        <li key={contract.id || idx} className="flex flex-row justify-between mt-2 gap-2">
+                                                            {contract.title || "Untitled Contract"}
+                                                            <Button variant="outline" onClick={() => handleViewContract(contract.id)}>View</Button>
+                                                        </li>
                                                     ))}
                                                 </ul>
                                             ) : (
@@ -303,7 +340,10 @@ const DashboardPage = () => {
                                             {applications && applications.length > 0 ? (
                                                 <ul>
                                                     {applications.map((application, idx) => (
-                                                        <li key={application.id || idx}>{application.title || "Untitled Contract"}</li>
+                                                        <li key={application.id || idx} className="flex flex-row justify-between mt-2 gap-2">
+                                                            {application.title || "Untitled Contract"}
+                                                            <Button variant="outline" onClick={() => handleViewApplication(application.id)}>View</Button>
+                                                        </li>
                                                     ))}
                                                 </ul>
                                             ) : (
