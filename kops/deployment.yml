@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: downwork
+spec: 
+  replicas: 2
+  selector:
+    matchLabels:
+      app: downwork
+  template:
+    metadata:
+      labels:
+        app: downwork
+    spec:
+      containers:
+      - name: downwork
+        image: shan117/downwork:latest
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: downwork-config
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        - containerPort: 443
+          protocol: TCP
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: default.conf
+        - name: ssl-certs
+          mountPath: /etc/letsencrypt
+          readOnly: true
+        - name: ssl-data
+          mountPath: /var/lib/letsencrypt
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
