@@ -30,10 +30,16 @@ jobs:
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Build and push Docker image
+      
+      - name: Build and push Docker image with build args
         run: |
-          docker build -t shan117/downwork:latest .
+          docker build \
+            --build-arg NEXT_PUBLIC_SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
+            --build-arg NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }} \
+            --build-arg NEXT_PUBLIC_BASE_URL=${{ secrets.BASE_URL }} \
+            -t shan117/downwork:latest .
           docker push shan117/downwork:latest
+
 
       - name: Deploy on EC2
         run: |
