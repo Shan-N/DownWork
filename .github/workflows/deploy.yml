@@ -44,8 +44,10 @@ jobs:
       - name: Deploy on EC2
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "
+            docker pull shan117/downwork:latest &&
             cd /home/ubuntu/DownWork &&
-            git pull origin main &&
             docker-compose down &&
-            docker-compose up -d --build
+            docker-compose up -d &&
+            docker system prune -f &&
+            docker image prune -a -f
           "
