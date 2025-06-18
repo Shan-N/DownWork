@@ -38,50 +38,13 @@ export function ProjectClient({ id }: ProjectClientProps) {
   const [error, setError] = useState<string | null>(null)
   const [coverLetter, setCoverLetter] = useState<string>("");
   const [freelancerId, setFreelancerId] = useState<string>("");
-  
+  const [isApplied, setIsApplied] = useState(false);
+  const [role, setRole] = useState<string | null>(null);
+
   const router = useRouter();
 
-  useEffect(() => {
-    const fetchFreelancer = async () => {
-      try {
-        const { data: freelancerId, error } = await supabase.auth.getUser();
-        if (error) {
-          toast.error(`Failed to fetch freelancer ID: ${error.message}`);
-          return;
-        }
-        setFreelancerId(freelancerId.user?.id || "");
-      } catch (error) {
-        if (error instanceof Error) {
-          toast.error(`Failed to fetch freelancer ID: ${error.message}`);
-        }
-      }
-    }
 
-    fetchFreelancer();
-  }, [])
-
-
-  const handleApplyProject = async () => {
-    try {
-      const response = await axios.post(`/api/projects/${id}`, {
-        proposal: coverLetter,
-        freelancerId: freelancerId
-      });
-      if (response.status === 200) {
-        toast.success("Application submitted successfully!");
-        setCoverLetter(""); 
-        router.push('/dashboard');
-      } else {
-        toast.error("Failed to submit application");
-      }
-    } catch (err) {
-      if (err instanceof Error) {
-        toast.error(`Failed to submit application: ${err.message}`);
-      }
-    }
-  }
-
-  useEffect(() => {
+    useEffect(() => {
     const fetchProject = async () => {
       try {
         setLoading(true)
@@ -100,8 +63,86 @@ export function ProjectClient({ id }: ProjectClientProps) {
       }
     }
 
-    fetchProject()
-  }, [id])
+    const fetchUserDetails = async () => {
+        try {
+          const { data: { user }, error } = await supabase.auth.getUser();
+          if (error || !user) {
+            toast.error("User not authenticated.");
+            router.push("/login");
+            return;
+          }
+          setFreelancerId(user.id);
+          setRole(user.user_metadata.role);
+        } catch (error) {
+          if (error instanceof Error) {
+            toast.error(`Failed to fetch user info: ${error.message}`);
+          }
+        }
+  };
+
+    fetchUserDetails();
+    fetchProject();
+
+    const checkIfApplied = async () => {
+      if (!freelancerId) {
+        return; // If freelancerId is not set, skip the check
+      }
+      try {
+        const { data, error } = await supabase
+          .from("applications")
+          .select("*")
+          .eq("project_id", id)
+          .eq("freelancer_id", freelancerId);
+
+        if (error) {
+          throw new Error(`Failed to check application status: ${error.message}`);
+        }
+
+        setIsApplied(data.length > 0);
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(`Failed to check application status: ${error.message}`);
+        }
+      }
+    };
+
+    checkIfApplied();
+  }, [id, freelancerId, router]);
+
+
+  const handleApplyProject = async () => {
+    if (isApplied) {
+      toast.error("You have already applied for this project.");
+      return;
+    }
+    try {
+      if (!coverLetter.trim()) {
+        toast.error("Please enter a cover letter.");
+        return;
+      }
+      const response = await axios.post(`/api/projects/${id}`, {
+        proposal: coverLetter,
+        freelancerId: freelancerId
+      });
+      if (response.status === 200) {
+        toast.success("Application submitted successfully!");
+        setCoverLetter(""); 
+        router.push('/dashboard');
+      } else {
+        toast.error("Failed to submit application");
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        toast.error(`Failed to submit application: ${err.message}`);
+      }
+    }
+  }
+
+  const handleEditProject = () => {
+    router.push(`/projects/${id}/edit`);
+  }
+
+
 
   if (loading) {
     return (
@@ -168,9 +209,10 @@ export function ProjectClient({ id }: ProjectClientProps) {
         </div>
       </div>
     </div>
+    {role === "freelancer" && (
     <div className="dark flex justify-center mt-8">
     <Drawer >
-      <DrawerTrigger className="dark border border-gray-300 rounded-lg px-6 flex items-center py-2 bg-white text-black">Apply</DrawerTrigger>
+      <DrawerTrigger className="dark border border-gray-300 rounded-lg px-6 flex items-center py-2 bg-white text-black" disabled={isApplied}>{isApplied ? "Applied" : "Apply"}</DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>Apply for Project</DrawerTitle>
@@ -189,6 +231,12 @@ export function ProjectClient({ id }: ProjectClientProps) {
       </DrawerContent>
     </Drawer>
     </div>
+    )}
+    { role !== "freelancer" && (
+      <div className="dark flex justify-center mt-8">
+        <Button variant="default" onClick={handleEditProject} className="w-full">Edit Project</Button>
+      </div>
+    )}
     </div>
   )
 }

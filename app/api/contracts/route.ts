@@ -29,3 +29,22 @@ export async function GET() {
         return NextResponse.json({ error: "An unexpected error occurred" }, { status: 500 });
     }
 }
+
+export async function POST(request: Request) {
+    try {
+        const { freelancer_id, client_id, project_id, terms } = await request.json();
+        const supabase = await createClient();
+        const { error : insertError } = await supabase
+            .from('contracts')
+            .insert([{ freelancer_id, client_id, project_id, terms }])
+            .select()
+            .single();
+        if (insertError) {
+            return NextResponse.json({ error: insertError.message }, { status: 400 });
+        }
+    } catch (error) {
+        if (error instanceof Error) {
+            return NextResponse.json({ error: error.message }, { status: 400 });
+        }
+    }
+}

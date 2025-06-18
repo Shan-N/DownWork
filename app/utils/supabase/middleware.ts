@@ -42,6 +42,7 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const userRole = user?.user_metadata?.role;
   if (
     request.nextUrl.pathname !== "/" &&
     !user &&
@@ -58,7 +59,22 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+
+  // Extract the project id from the pathname if it matches the pattern
+  const projectEditMatch = request.nextUrl.pathname.match(/^\/projects\/([^/]+)\/edit/);
+  const id = projectEditMatch ? projectEditMatch[1] : null;
+
+  if (
+    userRole !== "client" &&
+    id &&
+    request.nextUrl.pathname.startsWith(`/projects/${id}/edit`)
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/unauthorized";
+    return NextResponse.redirect(url);
+  }
   // IMPORTANT: You *must* return the supabaseResponse object as it is.
+  // Note: The `id` variable above is extracted from the URL slug (e.g., /projects/[slug]/edit).
   // If you're creating a new response object with NextResponse.next() make sure to:
   // 1. Pass the request in it, like so:
   //    const myNewResponse = NextResponse.next({ request })

@@ -1,5 +1,3 @@
-// app/api/projects/[id]/route.ts
-
 
 import { createClient } from "@/app/utils/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
@@ -18,7 +16,7 @@ export async function GET(
       .from("projects")
       .select("*")
       .eq("id", id)
-      .single<Project>() // 👈 Cast result to your Project type
+      .single<Project>()
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 })
