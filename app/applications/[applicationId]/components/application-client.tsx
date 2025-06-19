@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Navbar from "@/components/ui/navbar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -33,7 +33,7 @@ const ApplicationClient = ({ applicationId }: ApplicationClientProps) => {
     const [application, setApplication] = useState<Application | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [role, setRole] = useState<string | null>(null);
-    const router = useRouter();
+    // const router = useRouter();
 
     useEffect(() => {
         const fetchRole = async () => {
@@ -66,6 +66,10 @@ const ApplicationClient = ({ applicationId }: ApplicationClientProps) => {
                 }
             }
         }
+
+        // const fetchApplicationStatus = async () => {
+
+        // }
         
         fetchRole();
         fetchApplication();
@@ -76,7 +80,7 @@ const ApplicationClient = ({ applicationId }: ApplicationClientProps) => {
             const response = await axios.delete(`/api/applications/${applicationId}`);
             if (response.status === 200) {
                 toast.success("Application deleted successfully.");
-                router.push("/applications");
+                // router.push("/applications");
             }
             else {
                 toast.error("Failed to delete application: " + response.statusText);
@@ -90,6 +94,28 @@ const ApplicationClient = ({ applicationId }: ApplicationClientProps) => {
             }
         }
     }
+
+    const handleButtonClick = async (buttonValue : string, ) => {
+        try {
+            const response = await axios.post(`/api/applications/${applicationId}`, {
+                status: buttonValue,
+                method: 'POST'
+            })
+            if (response.status === 200) {
+                toast.success(`Application status ${buttonValue} successfully.`);
+                // router.push("/applications");
+            } else {
+                toast.error("Failed to update application status: " + response.statusText);
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                toast.error("Error updating application status: " + error.message);
+            } else {
+                toast.error("An unexpected error occurred while updating application status.");
+            }
+        }
+    }
+
 
     if (loading) {
         return <div>
@@ -138,9 +164,9 @@ const ApplicationClient = ({ applicationId }: ApplicationClientProps) => {
                             <Button variant="destructive" onClick={handleDeleteApplication} className="m-0">Withdraw Application</Button>
                         </div>
                         ) : (
-                        <div className="flex justify-center items-center space-x-4">
-                            <Button variant="secondary" className="m-0">Accept</Button>
-                            <Button variant="destructive" className="m-0">Reject</Button>
+                        <div className="flex justify-center items-center space-x-4 gap-4">
+                            <Button variant="secondary" onClick={() => handleButtonClick('accepted')} className="m-0">Accept</Button>
+                            <Button variant="destructive" onClick={() => handleButtonClick('rejected')} className="m-0">Reject</Button>
                         </div>
                         )
                     }
