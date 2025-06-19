@@ -70,7 +70,7 @@ const DashboardPage = () => {
                 return;
             }
             if (!data.user) {
-                router.push('/login'); // Redirect to login if no user is found
+                router.push('/login'); 
                 return;
             }
             const userId = data.user.id;

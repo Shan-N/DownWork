@@ -63,6 +63,7 @@ export async function POST(
       project_id: id,
       freelancer_id: freelancerId,
       proposal: proposal,
+      expected_budget: 0,
       status: "pending",
       created_at: new Date().toISOString(),
     })
