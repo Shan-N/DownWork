@@ -51,7 +51,7 @@ export async function POST(request: Request) {
       bio: user.user_metadata?.bio || "",
       skills: user.user_metadata?.skills || [],
       location: user.user_metadata?.location || "",
-      username: user.user_metadata?.username || "",
+      // username: user.user_metadata?.username || "",
       // avtar_url: user.user_metadata?.avtarUrl || "",
     });
 
