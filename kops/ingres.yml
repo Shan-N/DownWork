@@ -8,10 +8,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - downwork.shannn.xyz
+        - k8s.shannn.xyz
       secretName: downwork-tls
   rules:
-    - host: downwork.shannn.xyz
+    - host: k8s.shannn.xyz
       http:
         paths:
         - path: /
